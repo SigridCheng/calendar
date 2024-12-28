@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monthly Calendar</title>
+    <meta charset="UTF-8">
+    <style>
+        .calendar-container {
+            max-width: 300px;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .controls {
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .instructions {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            display: none; /* Hidden by default */
+        }
+
+        .month-display {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 20px repeat(7, 1fr);
+            gap: 1px;
+            border-right: 2px solid #333;
+        }
+
+        .calendar-header {
+            font-weight: bold;
+            text-align: center;
+            padding: 6px 2px;
+            background-color: inherit;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 0.8em;
+        }
+
+        .week-number {
+            text-align: center;
+            padding: 6px 2px;
+            background-color: inherit;
+            border-right: 2px solid #333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 0.8em;
+        }
+
+        .calendar-day {
+            padding: 6px 2px;
+            text-align: center;
+            border: 1px solid #ddd;
+            font-size: 0.8em;
+        }
+
+        .past-day {
+            backdrop-filter: blur(3px);
+            background-color: rgba(200, 200, 200, 0.3);
+            color: #666;
+            text-decoration: line-through;
+        }
+
+        select {
+            padding: 4px;
+            font-size: 0.9em;
+        }
+
+        #showInstructions {
+            font-size: 0.8em;
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="calendar-container">
+    <div id="showInstructions">Show Notion Embedding Instructions</div>
+    <div id="instructions" class="instructions">
+        To embed in Notion:<br>
+        1. Copy this entire HTML file<br>
+        2. Go to embed.new<br>
+        3. Paste the code and copy the generated URL<br>
+        4. In Notion, create an Embed block and paste the URL
+    </div>
+    <div class="controls">
+        <select id="startDay">
+            <option value="0">Start on Sunday</option>
+            <option value="1">Start on Monday</option>
+        </select>
+        <select id="background">
+            <option value="#ffffff">White</option>
+            <option value="#f0f8ff">Light Blue</option>
+            <option value="#f5f5dc">Beige</option>
+            <option value="#e6ffe6">Light Green</option>
+            <option value="#e6e6fa">Light Purple</option>
+        </select>
+    </div>
+    <div id="monthDisplay" class="month-display"></div>
+    <div id="calendar" class="calendar-grid"></div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const calendar = document.getElementById("calendar");
+        const monthDisplay = document.getElementById("monthDisplay");
+        const startDaySelect = document.getElementById("startDay");
+        const backgroundSelect = document.getElementById("background");
+        const showInstructions = document.getElementById("showInstructions");
+        const instructions = document.getElementById("instructions");
+
+        // Load saved preferences
+        const loadPreferences = () => {
+            const savedStartDay = localStorage.getItem('calendarStartDay');
+            const savedBackground = localStorage.getItem('calendarBackground');
+
+            if (savedStartDay) startDaySelect.value = savedStartDay;
+            if (savedBackground) backgroundSelect.value = savedBackground;
+        };
+
+        // Save preferences
+        const savePreferences = () => {
+            localStorage.setItem('calendarStartDay', startDaySelect.value);
+            localStorage.setItem('calendarBackground', backgroundSelect.value);
+        };
+
+        // Toggle instructions
+        showInstructions.addEventListener('click', () => {
+            if (instructions.style.display === 'none' || !instructions.style.display) {
+                instructions.style.display = 'block';
+                showInstructions.textContent = 'Hide Instructions';
+            } else {
+                instructions.style.display = 'none';
+                showInstructions.textContent = 'Show Notion Embedding Instructions';
+            }
+        });
+
+        const months = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        const getWeekNumber = (date) => {
+            const target = new Date(date);
+            const dayNr = (date.getDay() + 6) % 7;
+            target.setDate(target.getDate() - dayNr + 3);
+            const firstThursday = target.valueOf();
+            target.setMonth(0, 1);
+            if (target.getDay() !== 4) {
+                target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+            }
+            return 1 + Math.ceil((firstThursday - target) / 604800000);
+        };
+
+        const generateCalendar = (startDay, backgroundColor) => {
+            calendar.innerHTML = "";
+            calendar.style.backgroundColor = backgroundColor;
+
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+
+            monthDisplay.textContent = `${months[currentMonth]} ${currentYear}`;
+
+            // Create header for week numbers
+            const weekHeader = document.createElement("div");
+            weekHeader.classList.add("calendar-header");
+            weekHeader.textContent = "WK";
+            calendar.appendChild(weekHeader);
+
+            const days = startDay === 1
+                ? ["M", "T", "W", "T", "F", "S", "S"]
+                : ["S", "M", "T", "W", "T", "F", "S"];
+
+            days.forEach(day => {
+                const header = document.createElement("div");
+                header.classList.add("calendar-header");
+                header.textContent = day;
+                calendar.appendChild(header);
+            });
+
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+            const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            let startingDay = firstDayOfMonth.getDay();
+
+            if (startDay === 1) {
+                startingDay = startingDay === 0 ? 6 : startingDay - 1;
+            }
+
+            let dayCount = 1;
+            let currentDate = new Date(currentYear, currentMonth, 1);
+
+            while (dayCount <= totalDaysInMonth) {
+                const weekNum = document.createElement("div");
+                weekNum.classList.add("week-number");
+                weekNum.textContent = getWeekNumber(currentDate);
+                calendar.appendChild(weekNum);
+
+                for (let j = 0; j < 7; j++) {
+                    const dayCell = document.createElement("div");
+                    dayCell.classList.add("calendar-day");
+
+                    if ((dayCount === 1 && j < startingDay) || dayCount > totalDaysInMonth) {
+                        dayCell.textContent = "";
+                    } else {
+                        dayCell.textContent = dayCount;
+
+                        if (dayCount < today.getDate()) {
+                            dayCell.classList.add("past-day");
+                        }
+
+                        dayCount++;
+                    }
+
+                    calendar.appendChild(dayCell);
+                }
+
+                currentDate.setDate(currentDate.getDate() + 7);
+            }
+
+            // Save preferences after generating calendar
+            savePreferences();
+        };
+
+        // Event listeners
+        startDaySelect.addEventListener("change", () => {
+            generateCalendar(Number(startDaySelect.value), backgroundSelect.value);
+        });
+
+        backgroundSelect.addEventListener("change", () => {
+            generateCalendar(Number(startDaySelect.value), backgroundSelect.value);
+        });
+
+        // Load preferences and generate initial calendar
+        loadPreferences();
+        generateCalendar(Number(startDaySelect.value), backgroundSelect.value);
+    });
+</script>
+</body>
+</html>
