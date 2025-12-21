@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Custom Monthly Calendar</title>
+    <title>固定当前月-全功能日历</title>
     <meta charset="UTF-8">
     <style>
-        /* ... (Keep existing styles) ... */
         .calendar-container {
             max-width: 440px;
             margin: 15px auto;
-            font-family: Arial, sans-serif;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
             font-size: 10px;
         }
 
@@ -20,10 +19,7 @@
             flex-wrap: wrap;
         }
 
-        select {
-            font-size: 10px;
-            padding: 2px;
-        }
+        select { font-size: 10px; padding: 2px; }
 
         .month-display {
             font-weight: bold;
@@ -52,7 +48,7 @@
             padding: 2px;
             text-align: center;
             border: 1px solid #ccc;
-            min-height: 42px; /* Increased slightly for icons */
+            min-height: 42px;
             line-height: 1.1;
             display: flex;
             flex-direction: column;
@@ -61,135 +57,62 @@
             position: relative;
         }
 
-        .day-number {
-            font-size: 13px;
-            margin-bottom: 1px;
-        }
-
-        .lunar-date {
-            font-size: 9px;
-            color: #666;
-            margin-bottom: 0px;
-        }
-
-        .holiday-label {
-            font-size: 9px;
-            color: #ff4444;
-            font-weight: bold;
-            margin-top: 0px;
-        }
-
-        .solar-term {
-            font-size: 9px;
-            color: #2196F3;
-            font-weight: bold;
-            margin-top: 0px;
-        }
+        .day-number { font-size: 13px; margin-bottom: 1px; }
+        .lunar-date { font-size: 9px; color: #666; }
+        .holiday-label { font-size: 9px; color: #ff4444; font-weight: bold; }
+        .solar-term { font-size: 9px; color: #2196F3; font-weight: bold; }
 
         .work-badge {
-            position: absolute;
-            top: 1px;
-            right: 1px;
-            background-color: #ff9800;
-            color: white;
-            font-size: 9px;
-            padding: 0px 2px;
-            border-radius: 2px;
-            font-weight: bold;
+            position: absolute; top: 1px; right: 1px;
+            background-color: #ff9800; color: white;
+            font-size: 8px; padding: 0px 2px; border-radius: 2px; font-weight: bold;
         }
 
         .rest-badge {
-            position: absolute;
-            top: 1px;
-            right: 1px;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 9px;
-            padding: 0px 2px;
-            border-radius: 2px;
-            font-weight: bold;
+            position: absolute; top: 1px; right: 1px;
+            background-color: #4CAF50; color: white;
+            font-size: 8px; padding: 0px 2px; border-radius: 2px; font-weight: bold;
         }
 
         .birthday-icon {
-            position: absolute;
-            bottom: 3px;
-            left: 3px;
+            position: absolute; bottom: 3px; left: 3px;
             font-size: 18px;
+            cursor: help;
         }
 
-        .past-day {
-            text-decoration: line-through;
-            color: #999;
-        }
-
-        .other-month {
-            color: #ccc;
-        }
-
-        .today {
-            font-weight: bold;
-            background-color: #fffacd !important;
-        }
-
-        .weekend {
-            background-color: #fff0f0;
-        }
+        .past-day { text-decoration: line-through; color: #bbb; }
+        .other-month { color: #ccc; opacity: 0.5; }
+        .today { font-weight: bold; background-color: #fffacd !important; border: 1px solid #ff9800; }
+        .weekend { background-color: #fff0f0; }
 
         .embed-button {
-            padding: 4px 8px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            margin: 4px;
-            font-size: 10px;
+            padding: 4px 8px; background-color: #4CAF50; color: white;
+            border: none; border-radius: 3px; cursor: pointer; margin: 4px; font-size: 10px;
         }
 
         .arrow {
-            font-size: 14px;
-            cursor: pointer;
-            user-select: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 14px; cursor: pointer; user-select: none;
+            border-radius: 50%; width: 22px; height: 22px;
+            display: inline-flex; align-items: center; justify-content: center;
             background-color: #f0f0f0;
-            margin: 0 4px;
         }
 
         #calendar-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            margin-bottom:-20px;
-            height: 32px;
+            display: flex; justify-content: center; align-items: center;
+            gap: 100px; margin-top: -30px; margin-bottom: 10px;
         }
 
         .hidden { display: none; }
 
         .week-display {
-            font-size: 11px;
-            text-align: center;
-            padding: 3px;
-            border: 1px solid #ccc;
-            min-height: 38px;
-            line-height: 14px;
+            font-size: 11px; text-align: center; padding: 3px;
+            border: 1px solid #ccc; line-height: 38px; color: #999;
         }
 
         .legend {
-            margin: 12px auto;
-            max-width: 440px;
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            font-size: 9px;
-            flex-wrap: wrap;
+            margin: 15px auto; max-width: 440px; display: flex;
+            gap: 12px; justify-content: center; font-size: 9px; flex-wrap: wrap;
         }
-
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .legend-color { width: 10px; height: 10px; border-radius: 2px; }
     </style>
@@ -203,35 +126,27 @@
             <option value="1">Start from Monday</option>
         </select>
         <select id="background">
-            <option value="#ffffff">White Grid</option>
-            <option value="#f0f8ff">Light Blue Grid</option>
+            <option value="#ffffff">White</option>
+            <option value="#f0f8ff">Light Blue</option>
             <option value="#f5f5dc">Beige Grid</option>
-            <option value="#e6ffe6">Light Green Grid</option>
-            <option value="#e6e6fa">Light Purple Grid</option>
+            <option value="#e6ffe6">Light Green格</option>
+            <option value="#e6e6fa">Light Purple格</option>
         </select>
         <button id="embedButton" class="embed-button">Embed</button>
     </div>
 
     <div class="month-display"></div>
-    <div id="calendar-controls" class="controls">
-        <span id="arrowLeft" class="arrow prev" style="position: relative; left:-50px; top: -33px;">&lt;</span>
-        <span class="arrow next" style="position: relative; right:-50px; top: -35px;">&gt;</span>
+    <div id="calendar-controls">
+        <span class="arrow prev" style="position: relative; left:-50px;">&lt;</span>
+        <span class="arrow next" style="position: relative; right:-50px;">&gt;</span>
     </div>
 
     <div id="calendar"></div>
 </div>
 
-<!--<div class="legend">-->
-<!--    <div class="legend-item"><span class="legend-color" style="background-color: #ff4444;"></span><span>节假日</span></div>-->
-<!--    <div class="legend-item"><span class="legend-color" style="background-color: #2196F3;"></span><span>节气</span></div>-->
-<!--    <div class="legend-item"><span class="legend-color" style="background-color: #4CAF50;"></span><span>休</span></div>-->
-<!--    <div class="legend-item"><span class="legend-color" style="background-color: #ff9800;"></span><span>班</span></div>-->
-<!--    <div class="legend-item"><span class="legend-color" style="background-color: #fff0f0;"></span><span>周末</span></div>-->
-<!--    <div class="legend-item"><span>🎂</span><span>生日</span></div>-->
-<!--</div>-->
 
 <script>
-    // --- 1 & 3: CONFIGURATION FOR CUSTOM HOLIDAYS AND BIRTHDAYS ---
+    // ================= 配置区 =================
     const customData = {
         holidays: {
             '1-26': '腊八节',
@@ -246,7 +161,6 @@
             '10-19':'重阳节',
             '11-1':'万圣节🎃','11-26':'感恩节',
             '12-24':'平安夜','12-25':'圣诞节🎄',
-            // Format: 'MM-DD': 'Name'
         },
         birthdays: {
             '5-19': 'My',
@@ -254,52 +168,35 @@
             '5-26': 'My',
             '5-22': 'My',
             '10-4': 'My',
-            // Format: 'MM-DD': 'Name'
         }
     };
 
-    // Keep existing Lunar Logic...
+    // 农历核心数据与逻辑
     const lunarInfo = [0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,0x06ca0,0x0b550,0x15355,0x04da0,0x0a5d0,0x14573,0x052d0,0x0a9a8,0x0e950,0x06aa0,0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b5a0,0x195a6,0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,0x05aa0,0x076a3,0x096d0,0x04bd7,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0];
-    const nStr1 = ["日","一","二","三","四","五","六","七","八","九","十"];
-    const nStr2 = ["初","十","廿","卅"];
     const monthCn = ["正","二","三","四","五","六","七","八","九","十","冬","腊"];
+    const nStr1 = ["日","一","二","三","四","五","六","七","八","九","十"];
 
-    function lYearDays(y) { let sum = 348; for(let i = 0x8000; i > 0x8; i >>= 1) sum += (lunarInfo[y-1900] & i)? 1 : 0; return sum + leapDays(y); }
-    function leapDays(y) { if(leapMonth(y)) return (lunarInfo[y-1900] & 0x10000)? 30 : 29; return 0; }
-    function leapMonth(y) { return lunarInfo[y-1900] & 0xf; }
-    function monthDays(y,m) { return (lunarInfo[y-1900] & (0x10000>>m))? 30 : 29; }
-    function toLunar(date) {
-        let i, leap = 0, temp = 0;
-        let year = date.getFullYear();
-        let month = date.getMonth() + 1;
-        let day = date.getDate();
-        let offset = Math.floor((Date.UTC(year, month-1, day) - Date.UTC(1900, 0, 31))/86400000);
-        for(i = 1900; i < 2100 && offset > 0; i++) { temp = lYearDays(i); offset -= temp; }
-        if(offset < 0) { offset += temp; i--; }
-        let lunarYear = i; leap = leapMonth(i); let isLeap = false;
-        for(i = 1; i < 13 && offset > 0; i++) {
-            if(leap > 0 && i == (leap+1) && isLeap == false) { --i; isLeap = true; temp = leapDays(lunarYear); }
-            else { temp = monthDays(lunarYear, i); }
-            if(isLeap == true && i == (leap+1)) isLeap = false;
+    function getLunar(date) {
+        let i, leap=0, temp=0, offset = Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(1900,0,31))/86400000);
+        for(i=1900; i<2100 && offset>0; i++) {
+            temp = 348; for(let j=0x8000; j>0x8; j>>=1) temp += (lunarInfo[i-1900] & j)? 1:0;
+            let lv = lunarInfo[i-1900] & 0xf; temp += (lv ? (lunarInfo[i-1900] & 0x10000 ? 30 : 29) : 0);
             offset -= temp;
         }
-        if(offset == 0 && leap > 0 && i == leap+1) { if(isLeap) { isLeap = false; } else { isLeap = true; --i; } }
-        if(offset < 0) { offset += temp; --i; }
-        return { year: lunarYear, month: i, day: offset + 1, isLeap: isLeap };
+        if(offset<0) { offset += temp; i--; }
+        let lYear = i, lLeap = lunarInfo[i-1900] & 0xf, lIsLeap = false;
+        for(i=1; i<13 && offset>0; i++) {
+            if(lLeap>0 && i==(lLeap+1) && lIsLeap==false) { --i; lIsLeap=true; temp = (lunarInfo[lYear-1900] & 0x10000)? 30:29; }
+            else { temp = (lunarInfo[lYear-1900] & (0x10000>>i))? 30:29; }
+            if(lIsLeap==true && i==(lLeap+1)) lIsLeap=false; offset -= temp;
+        }
+        if(offset==0 && lLeap>0 && i==lLeap+1) { if(lIsLeap) lIsLeap=false; else { lIsLeap=true; --i; } }
+        if(offset<0) { offset += temp; --i; }
+        let lDay = offset + 1;
+        if (lDay === 1) return (lIsLeap?"闰":"") + monthCn[i-1] + "月";
+        return (lDay==10?"初十": lDay==20?"二十": lDay==30?"三十": ["初","十","廿","卅"][Math.floor(lDay/10)] + nStr1[lDay%10]);
     }
-    function getLunarDayString(day) {
-        if(day == 10) return "初十";
-        if(day == 20) return "二十";
-        if(day == 30) return "三十";
-        return nStr2[Math.floor(day/10)] + nStr1[day%10];
-    }
-    function getLunarDateString(date) {
-        let lunar = toLunar(date);
-        if(lunar.day == 1) return (lunar.isLeap ? "闰" : "") + monthCn[lunar.month-1] + "月";
-        return getLunarDayString(lunar.day);
-    }
-
-    // Default Holidays
+    
     const chineseHolidays = {
         '1-1': '元旦', '2-14': '情人节', '3-8': '妇女节', '3-12': '植树节',
         '5-1': '劳动节', '5-4': '青年节', '6-1': '儿童节', '7-1': '建党节',
@@ -321,172 +218,109 @@
         const initialControls = document.getElementById("initial-controls");
         const monthDisplay = document.querySelector(".month-display");
 
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-        
-        function getWeekNumber(date) {
-            const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-            const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-            return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+        const today = new Date();
+        let viewMonth = today.getMonth();
+        let viewYear = today.getFullYear();
+
+        function getWeekNo(date) {
+            const firstDay = new Date(date.getFullYear(), 0, 1);
+            return Math.ceil((((date - firstDay) / 86400000) + firstDay.getDay() + 1) / 7);
         }
 
-        function applyGridColor() {
-            const gridColor = backgroundSelect.value;
-            document.querySelectorAll('.calendar-day, .calendar-header, .week-display').forEach(el => {
-                if (!el.classList.contains('today') && !el.classList.contains('weekend')) {
-                    el.style.backgroundColor = gridColor;
-                }
-            });
-        }
-
-        function getHolidayForDate(month, day) {
-            const key = `${month + 1}-${day}`;
-            // Prioritize custom holidays
-            return customData.holidays[key] || chineseHolidays[key] || null;
-        }
-
-        function getBirthdayForDate(month, day) {
-            const key = `${month + 1}-${day}`;
-            return customData.birthdays[key] || null;
-        }
-
-        function getSolarTermForDate(year, month, day) {
-            const key = `${month + 1}-${day}`;
-            const yearTerms = solarTermsByYear[year];
-            return yearTerms ? yearTerms[key] || null : null;
-        }
-
-        function getWorkdayAdjustment(year, month, day) {
-            const key = `${month + 1}-${day}`;
-            const yearAdjustments = workdayAdjustmentsByYear[year];
-            return yearAdjustments ? yearAdjustments[key] || null : null;
-        }
-
-        function generateCalendar() {
+        function render() {
             const startDay = parseInt(startDaySelect.value);
-            const today = new Date();
-            const date = new Date(currentYear, currentMonth, 1);
+            const firstDayDate = new Date(viewYear, viewMonth, 1);
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-            monthDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-            let calendarHTML = '<div class="calendar-grid">';
-            const days = startDay === 0 ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-            days.forEach(day => { calendarHTML += `<div class="calendar-header">${day}</div>`; });
-            calendarHTML += '<div class="calendar-header">Week</div>';
+            monthDisplay.textContent = `${monthNames[viewMonth]} ${viewYear}`;
+            let html = '<div class="calendar-grid">';
+            const headers = startDay === 0 ? ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"] : ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+            headers.forEach(h => html += `<div class="calendar-header">${h}</div>`);
+            html += '<div class="calendar-header">Week</div>';
 
-            let firstDay = date.getDay();
-            if (startDay === 1) firstDay = firstDay === 0 ? 6 : firstDay - 1;
+            let firstIdx = firstDayDate.getDay();
+            if (startDay === 1) firstIdx = (firstIdx === 0 ? 6 : firstIdx - 1);
 
-            const lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
-            let dayCount = 1;
-            let nextMonthDay = 1;
-            const totalRows = Math.ceil((firstDay + lastDay) / 7);
+            const lastDay = new Date(viewYear, viewMonth + 1, 0).getDate();
+            const prevLastDay = new Date(viewYear, viewMonth, 0).getDate();
+            let nextD = 1;
+            const rowCount = Math.ceil((firstIdx + lastDay) / 7);
 
-            for (let row = 0; row < totalRows; row++) {
-                for (let col = 0; col < 7; col++) {
-                    const dayPosition = row * 7 + col;
-                    const dayIndex = dayPosition - firstDay;
-
-                    if (dayIndex < 0) {
-                        const prevDay = prevMonthLastDay + dayIndex + 1;
-                        calendarHTML += `<div class="calendar-day other-month"><span class="day-number">${prevDay}</span></div>`;
-                    } else if (dayIndex >= lastDay) {
-                        calendarHTML += `<div class="calendar-day other-month"><span class="day-number">${nextMonthDay++}</span></div>`;
+            for (let r = 0; r < rowCount; r++) {
+                for (let c = 0; c < 7; c++) {
+                    const i = r * 7 + c - firstIdx;
+                    if (i < 0) {
+                        html += `<div class="calendar-day other-month"><span class="day-number">${prevLastDay + i + 1}</span></div>`;
+                    } else if (i >= lastDay) {
+                        html += `<div class="calendar-day other-month"><span class="day-number">${nextD++}</span></div>`;
                     } else {
-                        const currentDate = dayIndex + 1;
-                        const currentDateObj = new Date(currentYear, currentMonth, currentDate);
-                        const isToday = currentDate === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
-                        const isPast = new Date(currentYear, currentMonth, currentDate) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                        const curD = i + 1;
+                        const curObj = new Date(viewYear, viewMonth, curD);
+                        const mDK = `${viewMonth + 1}-${curD}`;
 
-                        const holiday = getHolidayForDate(currentMonth, currentDate);
-                        const solarTerm = getSolarTermForDate(currentYear, currentMonth, currentDate);
-                        const birthday = getBirthdayForDate(currentMonth, currentDate);
-                        const workdayAdj = getWorkdayAdjustment(currentYear, currentMonth, currentDate);
-                        const isWeekend = (currentDateObj.getDay() === 0 || currentDateObj.getDay() === 6);
+                        const hol = customData.holidays[mDK] || chineseHolidays[mDK] || null;
+                        const sol = (solarTermsByYear[viewYear] || {})[mDK] || null;
+                        const bdy = customData.birthdays[mDK] || null;
+                        const adj = (workdayAdjustmentsByYear[viewYear] || {})[mDK] || null;
 
-                        let dayClass = 'calendar-day';
-                        if (isToday) dayClass += ' today';
-                        if (isPast) dayClass += ' past-day';
-                        if (isWeekend && !workdayAdj) dayClass += ' weekend';
+                        const isWE = (curObj.getDay() === 0 || curObj.getDay() === 6);
+                        const isToday = (curD === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear());
+                        const isPast = (curObj < new Date(today.getFullYear(), today.getMonth(), today.getDate()));
 
-                        calendarHTML += `<div class="${dayClass}">`;
+                        let cls = 'calendar-day' + (isToday ? ' today' : '') + (isPast ? ' past-day' : '') + (isWE && !adj ? ' weekend' : '');
 
-                        // Birthday Cake Emoji
-                        if(birthday) calendarHTML += `<span class="birthday-icon" title="${birthday}">🎂</span>`;
+                        html += `<div class="${cls}">`;
+                        if(bdy) html += `<span class="birthday-icon" title="${bdy}">🎂</span>`;
+                        if(adj === 'work') html += '<span class="work-badge">班</span>';
+                        else if(adj === 'rest') html += '<span class="rest-badge">休</span>';
 
-                        if(workdayAdj === 'work') calendarHTML += '<span class="work-badge">班</span>';
-                        else if(workdayAdj === 'rest') calendarHTML += '<span class="rest-badge">休</span>';
-
-                        calendarHTML += `<span class="day-number">${currentDate}</span>`;
-
-                        // --- 2: LOGIC TO HIDE LUNAR IF HOLIDAY OR SOLAR TERM EXISTS ---
-                        if (holiday) {
-                            calendarHTML += `<span class="holiday-label">${holiday}</span>`;
-                        } else if (solarTerm) {
-                            calendarHTML += `<span class="solar-term">${solarTerm}</span>`;
-                        } else {
-                            // Only show lunar date if no holiday or solar term is present
-                            calendarHTML += `<span class="lunar-date">${getLunarDateString(currentDateObj)}</span>`;
-                        }
-
-                        calendarHTML += '</div>';
+                        html += `<span class="day-number">${curD}</span>`;
+                        // 有节日或节气时不显示农历
+                        if (hol) html += `<span class="holiday-label">${hol}</span>`;
+                        else if (sol) html += `<span class="solar-term">${sol}</span>`;
+                        else html += `<span class="lunar-date">${getLunar(curObj)}</span>`;
+                        html += '</div>';
                     }
                 }
-                const weekDate = new Date(currentYear, currentMonth, Math.max(1, dayCount - firstDay + (row * 7)));
-                calendarHTML += `<div class="week-display">${getWeekNumber(weekDate)}</div>`;
+                const weekDate = new Date(viewYear, viewMonth, Math.max(1, (r * 7) - firstIdx + 1));
+                html += `<div class="week-display">${getWeekNo(weekDate)}</div>`;
             }
+            calendar.innerHTML = html + '</div>';
 
-            calendarHTML += '</div>';
-            calendar.innerHTML = calendarHTML;
-            applyGridColor();
+            // 背景色应用
+            const bg = backgroundSelect.value;
+            document.querySelectorAll('.calendar-day:not(.today):not(.weekend), .calendar-header, .week-display').forEach(el => el.style.backgroundColor = bg);
         }
 
-        function changeMonth(delta) {
-            currentMonth += delta;
-            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-            else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-            generateCalendar();
-            updateURL();
-            }
+        // Embed 只保存偏好，不保存特定的年月
+        embedButton.addEventListener("click", () => {
+            const url = new URL(window.location.origin + window.location.pathname);
+            url.searchParams.set('startDay', startDaySelect.value);
+            url.searchParams.set('bg', backgroundSelect.value);
+            window.history.pushState({}, '', url.toString());
 
-            function updateURL() {
-                const url = new URL(window.location.href);
-                url.searchParams.set('startDay', startDaySelect.value);
-                url.searchParams.set('background', backgroundSelect.value);
-                // url.searchParams.set('month', currentMonth);
-                // url.searchParams.set('year', currentYear);
-                window.history.pushState({}, '', url.toString());
-            }
-
-            embedButton.addEventListener("click", () => {
-                const embedUrl = window.location.href;
-                navigator.clipboard.writeText(embedUrl).then(() => {
-                    initialControls.classList.add("hidden");
-                    calendarControls.classList.remove("hidden");
-                    updateURL();
-                });
-            });
-
-            // Check URL parameters on load
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('startDay') && urlParams.has('background')) {
-                startDaySelect.value = urlParams.get('startDay');
-                backgroundSelect.value = urlParams.get('background');
-                // currentMonth = parseInt(urlParams.get('month')) || currentMonth;
-                // currentYear = parseInt(urlParams.get('year')) || currentYear;
-
+            navigator.clipboard.writeText(url.toString()).then(() => {
                 initialControls.classList.add("hidden");
-                calendarControls.classList.remove("hidden");
-            }
+                alert('配置已保存！链接已复制到剪贴板。该链接将永远展示实时月份。');
+            });
+        });
 
+        // 读入偏好
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('startDay')) {
+            startDaySelect.value = params.get('startDay');
+            backgroundSelect.value = params.get('bg');
+            initialControls.classList.add("hidden");
+        }
 
-        document.querySelector(".prev").addEventListener("click", () => changeMonth(-1));
-        document.querySelector(".next").addEventListener("click", () => changeMonth(1));
-        startDaySelect.addEventListener("change", generateCalendar);
-        backgroundSelect.addEventListener("change", generateCalendar);
+        // 箭头切换临时月份
+        document.querySelector(".prev").addEventListener("click", () => { viewMonth--; if(viewMonth<0){viewMonth=11;viewYear--;} render(); });
+        document.querySelector(".next").addEventListener("click", () => { viewMonth++; if(viewMonth>11){viewMonth=0;viewYear++;} render(); });
 
-        generateCalendar();
+        startDaySelect.addEventListener("change", render);
+        backgroundSelect.addEventListener("change", render);
+
+        render();
     });
 </script>
 </body>
