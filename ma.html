@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <style>
         .calendar-container {
-            max-width: 700px;
+            max-width: 550px;
             margin: 20px auto;
             font-family: Arial, sans-serif;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .controls {
@@ -20,7 +20,7 @@
         }
 
         select {
-            font-size: 14px;
+            font-size: 12px;
             padding: 3px;
         }
 
@@ -46,10 +46,10 @@
         }
 
         .calendar-day {
-            padding: 5px;
+            padding: 4px;
             text-align: center;
             border: 1px solid #ccc;
-            min-height: 65px;
+            min-height: 55px;
             line-height: 1.2;
             display: flex;
             flex-direction: column;
@@ -59,25 +59,25 @@
         }
 
         .day-number {
-            font-size: 16px;
+            font-size: 14px;
             margin-bottom: 2px;
         }
 
         .lunar-date {
             font-size: 9px;
             color: #666;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
 
         .holiday-label {
-            font-size: 10px;
+            font-size: 9px;
             color: #ff4444;
             font-weight: bold;
             margin-top: 1px;
         }
 
         .solar-term {
-            font-size: 10px;
+            font-size: 9px;
             color: #2196F3;
             font-weight: bold;
             margin-top: 1px;
@@ -126,31 +126,32 @@
         }
 
         .embed-button {
-            padding: 6px 12px;
+            padding: 5px 10px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 3px;
             cursor: pointer;
             margin: 5px;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .arrow {
-            font-size: 22px;
+            font-size: 20px;
             cursor: pointer;
             user-select: none;
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            padding: 10px;
+            padding: 8px;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
             background-color: #f0f0f0;
+            z-index: 10;
         }
 
         .arrow:hover {
@@ -158,17 +159,17 @@
         }
 
         .prev {
-            left: 10px;
+            left: 0;
         }
 
         .next {
-            right: 10px;
+            right: 0;
         }
 
         #calendar-controls {
             position: relative;
-            height: 50px;
-            margin-bottom: 10px;
+            height: 0;
+            margin: 0;
         }
 
         .hidden {
@@ -176,17 +177,17 @@
         }
 
         .week-display {
-            font-size: 12px;
+            font-size: 11px;
             text-align: center;
             padding: 5px;
             border: 1px solid #ccc;
-            min-height: 65px;
+            min-height: 55px;
             line-height: 20px;
         }
 
         .legend {
-            margin: 20px auto;
-            max-width: 700px;
+            margin: 15px auto;
+            max-width: 550px;
             display: flex;
             gap: 15px;
             justify-content: center;
@@ -224,12 +225,11 @@
             <button id="embedButton" class="embed-button">Embed</button>
         </div>
 
-        <div id="calendar-controls" class="controls hidden">
+        <div class="month-display"></div>
+        <div id="calendar-controls" class="controls">
             <span class="arrow prev">&lt;</span>
             <span class="arrow next">&gt;</span>
         </div>
-        
-        <div class="month-display"></div>
 
         <div id="calendar"></div>
     </div>
@@ -415,8 +415,53 @@
             2026: solarTerms2026
         };
 
-        // 2025年调休安排
-        const workdayAdjustments2025 = {
+        // 2026年调休安排
+        const workdayAdjustments2026 = {
+            '1-1': 'rest',   // 元旦
+            '1-2': 'rest',
+            '1-3': 'rest',
+            '1-4': 'work',   // 元旦调休补班
+            '2-14': 'work',  // 春节调休补班
+            '2-15': 'rest',  // 春节
+            '2-16': 'rest',
+            '2-17': 'rest',
+            '2-18': 'rest',
+            '2-19': 'rest',
+            '2-20': 'rest',
+            '2-21': 'rest',
+            '2-22': 'rest',
+            '2-23': 'rest',
+            '2-28': 'work',  // 春节调休补班
+            '4-4': 'rest',   // 清明节
+            '4-5': 'rest',
+            '4-6': 'rest',
+            '5-1': 'rest',   // 劳动节
+            '5-2': 'rest',
+            '5-3': 'rest',
+            '5-4': 'rest',
+            '5-5': 'rest',
+            '5-9': 'work',   // 劳动节调休补班
+            '6-19': 'rest',  // 端午节
+            '6-20': 'rest',
+            '6-21': 'rest',
+            '9-20': 'work',  // 国庆节调休补班
+            '9-25': 'rest',  // 中秋节
+            '9-26': 'rest',
+            '9-27': 'rest',
+            '10-1': 'rest',  // 国庆节
+            '10-2': 'rest',
+            '10-3': 'rest',
+            '10-4': 'rest',
+            '10-5': 'rest',
+            '10-6': 'rest',
+            '10-7': 'rest',
+            '10-10': 'work'  // 国庆节调休补班
+        };
+
+        const workdayAdjustmentsByYear = {
+            2025: workdayAdjustments2025,
+            2026: workdayAdjustments2026
+        };
             '1-26': 'work',  // 春节调休补班
             '1-28': 'rest',  // 春节假期
             '1-29': 'rest',
@@ -488,9 +533,9 @@
             }
 
             function getWorkdayAdjustment(year, month, day) {
-                if(year !== 2025) return null;
                 const key = `${month + 1}-${day}`;
-                return workdayAdjustments2025[key] || null;
+                const yearAdjustments = workdayAdjustmentsByYear[year];
+                return yearAdjustments ? yearAdjustments[key] || null : null;
             }
 
             function generateCalendar() {
@@ -616,8 +661,8 @@
                 const embedUrl = window.location.href;
                 navigator.clipboard.writeText(embedUrl).then(() => {
                     initialControls.classList.add("hidden");
-                    calendarControls.classList.remove("hidden");
                     updateURL();
+                    alert('链接已复制到剪贴板！');
                 });
             });
 
@@ -629,7 +674,6 @@
                 currentYear = parseInt(urlParams.get('year')) || currentYear;
 
                 initialControls.classList.add("hidden");
-                calendarControls.classList.remove("hidden");
             }
 
             document.querySelector(".prev").addEventListener("click", () => changeMonth(-1));
