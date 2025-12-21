@@ -141,29 +141,34 @@
             cursor: pointer;
             user-select: none;
             position: absolute;
-            top: 100px;
+            top: 50%;
             transform: translateY(-50%);
             padding: 10px;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: #f0f0f0;
+        }
+
+        .arrow:hover {
+            background-color: #e0e0e0;
         }
 
         .prev {
-            left: -30px;
+            left: 10px;
         }
 
         .next {
-            right: -32px;
+            right: 10px;
         }
 
         #calendar-controls {
             position: relative;
-            height: 0;
-            margin: 0;
+            height: 50px;
+            margin-bottom: 10px;
         }
 
         .hidden {
@@ -219,12 +224,12 @@
             <button id="embedButton" class="embed-button">Embed</button>
         </div>
 
-        <div class="month-display"></div>
         <div id="calendar-controls" class="controls hidden">
             <span class="arrow prev">&lt;</span>
-            <div class="month-display"></div>
             <span class="arrow next">&gt;</span>
         </div>
+        
+        <div class="month-display"></div>
 
         <div id="calendar"></div>
     </div>
