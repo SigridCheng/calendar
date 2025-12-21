@@ -26,9 +26,11 @@
 
         .month-display {
             font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 5px;
+            font-size: 1.1em;
             text-align: center;
+            line-height: 40px;
+            height: 40px;
+            margin: 0;
         }
 
         .calendar-grid {
@@ -46,10 +48,10 @@
         }
 
         .calendar-day {
-            padding: 4px;
+            padding: 3px;
             text-align: center;
             border: 1px solid #ccc;
-            min-height: 55px;
+            min-height: 48px;
             line-height: 1.2;
             display: flex;
             flex-direction: column;
@@ -59,28 +61,28 @@
         }
 
         .day-number {
-            font-size: 14px;
-            margin-bottom: 2px;
+            font-size: 13px;
+            margin-bottom: 1px;
         }
 
         .lunar-date {
-            font-size: 9px;
+            font-size: 8px;
             color: #666;
             margin-bottom: 1px;
         }
 
         .holiday-label {
-            font-size: 9px;
+            font-size: 8px;
             color: #ff4444;
             font-weight: bold;
-            margin-top: 1px;
+            margin-top: 0px;
         }
 
         .solar-term {
-            font-size: 9px;
+            font-size: 8px;
             color: #2196F3;
             font-weight: bold;
-            margin-top: 1px;
+            margin-top: 0px;
         }
 
         .work-badge {
@@ -137,39 +139,31 @@
         }
 
         .arrow {
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             user-select: none;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 8px;
+            padding: 6px;
             border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            display: flex;
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             background-color: #f0f0f0;
-            z-index: 10;
+            margin: 0 5px;
         }
 
         .arrow:hover {
             background-color: #e0e0e0;
         }
 
-        .prev {
-            left: 0;
-        }
-
-        .next {
-            right: 0;
-        }
-
         #calendar-controls {
-            position: relative;
-            height: 0;
-            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+            height: 40px;
         }
 
         .hidden {
@@ -228,6 +222,7 @@
         <div class="month-display"></div>
         <div id="calendar-controls" class="controls">
             <span class="arrow prev">&lt;</span>
+            <span style="min-width: 200px; text-align: center;"></span>
             <span class="arrow next">&gt;</span>
         </div>
 
@@ -260,11 +255,6 @@
     <script>
         // 农历计算
         const lunarInfo = [0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,0x06ca0,0x0b550,0x15355,0x04da0,0x0a5d0,0x14573,0x052d0,0x0a9a8,0x0e950,0x06aa0,0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b5a0,0x195a6,0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,0x05aa0,0x076a3,0x096d0,0x04bd7,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0];
-        const solarMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
-        const gan = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
-        const zhi = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
-        const animals = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"];
-        const solarTerm = ["小寒","大寒","立春","雨水","惊蛰","春分","清明","谷雨","立夏","小满","芒种","夏至","小暑","大暑","立秋","处暑","白露","秋分","寒露","霜降","立冬","小雪","大雪","冬至"];
         const nStr1 = ["日","一","二","三","四","五","六","七","八","九","十"];
         const nStr2 = ["初","十","廿","卅"];
         const monthCn = ["正","二","三","四","五","六","七","八","九","十","冬","腊"];
@@ -363,7 +353,7 @@
             return getLunarDayString(lunar.day);
         }
 
-        // 中国节假日数据（固定日期）
+        // 中国节假日数据
         const chineseHolidays = {
             '1-1': '元旦',
             '2-14': '情人节',
@@ -378,7 +368,7 @@
             '10-1': '国庆节'
         };
 
-        // 2025年节气数据（精确日期）
+        // 2025年节气数据
         const solarTerms2025 = {
             '1-5': '小寒', '1-20': '大寒',
             '2-3': '立春', '2-18': '雨水',
@@ -417,28 +407,28 @@
 
         // 2025年调休安排
         const workdayAdjustments2025 = {
-            '1-26': 'work',  // 春节调休补班
-            '1-28': 'rest',  // 春节假期
+            '1-26': 'work',
+            '1-28': 'rest',
             '1-29': 'rest',
             '1-30': 'rest',
             '1-31': 'rest',
             '2-1': 'rest',
             '2-2': 'rest',
             '2-4': 'rest',
-            '4-4': 'rest',  // 清明节
+            '4-4': 'rest',
             '4-5': 'rest',
             '4-6': 'rest',
-            '4-27': 'work', // 劳动节调休补班
-            '5-1': 'rest',  // 劳动节
+            '4-27': 'work',
+            '5-1': 'rest',
             '5-2': 'rest',
             '5-3': 'rest',
             '5-4': 'rest',
             '5-5': 'rest',
-            '5-31': 'rest', // 端午节
+            '5-31': 'rest',
             '6-1': 'rest',
             '6-2': 'rest',
-            '9-28': 'work', // 国庆节调休补班
-            '10-1': 'rest', // 国庆节
+            '9-28': 'work',
+            '10-1': 'rest',
             '10-2': 'rest',
             '10-3': 'rest',
             '10-4': 'rest',
@@ -446,17 +436,17 @@
             '10-6': 'rest',
             '10-7': 'rest',
             '10-8': 'rest',
-            '10-11': 'work' // 国庆节调休补班
+            '10-11': 'work'
         };
 
         // 2026年调休安排
         const workdayAdjustments2026 = {
-            '1-1': 'rest',   // 元旦
+            '1-1': 'rest',
             '1-2': 'rest',
             '1-3': 'rest',
-            '1-4': 'work',   // 元旦调休补班
-            '2-14': 'work',  // 春节调休补班
-            '2-15': 'rest',  // 春节
+            '1-4': 'work',
+            '2-14': 'work',
+            '2-15': 'rest',
             '2-16': 'rest',
             '2-17': 'rest',
             '2-18': 'rest',
@@ -465,67 +455,36 @@
             '2-21': 'rest',
             '2-22': 'rest',
             '2-23': 'rest',
-            '2-28': 'work',  // 春节调休补班
-            '4-4': 'rest',   // 清明节
+            '2-28': 'work',
+            '4-4': 'rest',
             '4-5': 'rest',
             '4-6': 'rest',
-            '5-1': 'rest',   // 劳动节
+            '5-1': 'rest',
             '5-2': 'rest',
             '5-3': 'rest',
             '5-4': 'rest',
             '5-5': 'rest',
-            '5-9': 'work',   // 劳动节调休补班
-            '6-19': 'rest',  // 端午节
+            '5-9': 'work',
+            '6-19': 'rest',
             '6-20': 'rest',
             '6-21': 'rest',
-            '9-20': 'work',  // 国庆节调休补班
-            '9-25': 'rest',  // 中秋节
+            '9-20': 'work',
+            '9-25': 'rest',
             '9-26': 'rest',
             '9-27': 'rest',
-            '10-1': 'rest',  // 国庆节
+            '10-1': 'rest',
             '10-2': 'rest',
             '10-3': 'rest',
             '10-4': 'rest',
             '10-5': 'rest',
             '10-6': 'rest',
             '10-7': 'rest',
-            '10-10': 'work'  // 国庆节调休补班
+            '10-10': 'work'
         };
 
         const workdayAdjustmentsByYear = {
             2025: workdayAdjustments2025,
             2026: workdayAdjustments2026
-        };
-            '1-26': 'work',  // 春节调休补班
-            '1-28': 'rest',  // 春节假期
-            '1-29': 'rest',
-            '1-30': 'rest',
-            '1-31': 'rest',
-            '2-1': 'rest',
-            '2-2': 'rest',
-            '2-4': 'rest',
-            '4-4': 'rest',  // 清明节
-            '4-5': 'rest',
-            '4-6': 'rest',
-            '4-27': 'work', // 劳动节调休补班
-            '5-1': 'rest',  // 劳动节
-            '5-2': 'rest',
-            '5-3': 'rest',
-            '5-4': 'rest',
-            '5-5': 'rest',
-            '5-31': 'rest', // 端午节
-            '6-1': 'rest',
-            '6-2': 'rest',
-            '9-28': 'work', // 国庆节调休补班
-            '10-1': 'rest', // 国庆节
-            '10-2': 'rest',
-            '10-3': 'rest',
-            '10-4': 'rest',
-            '10-5': 'rest',
-            '10-6': 'rest',
-            '10-7': 'rest',
-            '10-8': 'rest',
-            '10-11': 'work' // 国庆节调休补班
         };
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -534,7 +493,6 @@
             const backgroundSelect = document.getElementById("background");
             const embedButton = document.getElementById("embedButton");
             const initialControls = document.getElementById("initial-controls");
-            const calendarControls = document.getElementById("calendar-controls");
             const monthDisplay = document.querySelector(".month-display");
 
             let currentMonth = new Date().getMonth();
@@ -683,21 +641,31 @@
             }
 
             function updateURL() {
-                const url = new URL(window.location.href);
-                url.searchParams.set('startDay', startDaySelect.value);
-                url.searchParams.set('background', backgroundSelect.value);
-                url.searchParams.set('month', currentMonth);
-                url.searchParams.set('year', currentYear);
-                window.history.pushState({}, '', url.toString());
+                try {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('startDay', startDaySelect.value);
+                    url.searchParams.set('background', backgroundSelect.value);
+                    url.searchParams.set('month', currentMonth);
+                    url.searchParams.set('year', currentYear);
+                    window.history.pushState({}, '', url.toString());
+                } catch (e) {
+                    // 在某些环境下（如iframe）无法使用pushState，忽略错误
+                    console.log('URL update skipped');
+                }
             }
 
             embedButton.addEventListener("click", () => {
-                const embedUrl = window.location.href;
-                navigator.clipboard.writeText(embedUrl).then(() => {
+                try {
+                    const embedUrl = window.location.href;
+                    navigator.clipboard.writeText(embedUrl).then(() => {
+                        initialControls.classList.add("hidden");
+                        updateURL();
+                        alert('链接已复制到剪贴板！');
+                    });
+                } catch (e) {
                     initialControls.classList.add("hidden");
-                    updateURL();
-                    alert('链接已复制到剪贴板！');
-                });
+                    alert('设置已保存！');
+                }
             });
 
             const urlParams = new URLSearchParams(window.location.search);
