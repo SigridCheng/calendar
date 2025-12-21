@@ -323,15 +323,6 @@
 
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
-
-        embedButton.addEventListener("click", () => {
-                const embedUrl = window.location.href;
-                navigator.clipboard.writeText(embedUrl).then(() => {
-                    initialControls.classList.add("hidden");
-                    calendarControls.classList.remove("hidden");
-                    updateURL();
-                });
-            });
         
         function getWeekNumber(date) {
             const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
@@ -456,7 +447,39 @@
             if (currentMonth > 11) { currentMonth = 0; currentYear++; }
             else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
             generateCalendar();
-        }
+            updateURL();
+            }
+
+            function updateURL() {
+                const url = new URL(window.location.href);
+                url.searchParams.set('startDay', startDaySelect.value);
+                url.searchParams.set('background', backgroundSelect.value);
+                // url.searchParams.set('month', currentMonth);
+                // url.searchParams.set('year', currentYear);
+                window.history.pushState({}, '', url.toString());
+            }
+
+            embedButton.addEventListener("click", () => {
+                const embedUrl = window.location.href;
+                navigator.clipboard.writeText(embedUrl).then(() => {
+                    initialControls.classList.add("hidden");
+                    calendarControls.classList.remove("hidden");
+                    updateURL();
+                });
+            });
+
+            // Check URL parameters on load
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('startDay') && urlParams.has('background')) {
+                startDaySelect.value = urlParams.get('startDay');
+                backgroundSelect.value = urlParams.get('background');
+                // currentMonth = parseInt(urlParams.get('month')) || currentMonth;
+                // currentYear = parseInt(urlParams.get('year')) || currentYear;
+
+                initialControls.classList.add("hidden");
+                calendarControls.classList.remove("hidden");
+            }
+
 
         document.querySelector(".prev").addEventListener("click", () => changeMonth(-1));
         document.querySelector(".next").addEventListener("click", () => changeMonth(1));
