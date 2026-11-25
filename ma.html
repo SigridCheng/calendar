@@ -1,130 +1,212 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>固定当前月-全功能日历</title>
-    <meta charset="UTF-8">
-    <style>
-        .calendar-container {
-            max-width: 440px;
-            margin: 15px auto;
-            font-family: "Microsoft YaHei", Arial, sans-serif;
-            font-size: 10px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全功能万年日历</title>
 
-        .controls {
-            margin-bottom: 10px;
-            display: flex;
-            gap: 5px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+<style>
+* { box-sizing: border-box; }
 
-        select { font-size: 10px; padding: 2px; }
+.calendar-container {
+    max-width: 440px;
+    margin: 15px auto;
+    font-family: "Microsoft YaHei", Arial, sans-serif;
+    font-size: 10px;
+}
 
-        .month-display {
-            font-weight: bold;
-            font-size: 1.5em;
-            text-align: center;
-            line-height: 32px;
-            height: 32px;
-            margin: 0;
-        }
+.controls {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+}
 
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr) 36px;
-            gap: 1px;
-        }
+select {
+    font-size: 10px;
+    padding: 2px;
+}
 
-        .calendar-header {
-            padding: 3px;
-            text-align: center;
-            font-weight: bold;
-            border: 1px solid #ccc;
-            font-size: 10px;
-        }
+.month-display {
+    font-weight: bold;
+    font-size: 15px;
+    text-align: center;
+    line-height: 32px;
+    height: 32px;
+    margin: 0;
+}
 
-        .calendar-day {
-            padding: 2px;
-            text-align: center;
-            border: 1px solid #ccc;
-            min-height: 42px;
-            line-height: 1.1;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            position: relative;
-        }
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) 36px;
+    gap: 1px;
+}
 
-        .day-number { font-size: 13px; margin-bottom: 1px; }
-        .lunar-date { font-size: 9px; color: #666; }
-        .holiday-label { font-size: 9px; color: #ff4444; font-weight: bold; }
-        .solar-term { font-size: 9px; color: #2196F3; font-weight: bold; }
+.calendar-header {
+    padding: 3px 0;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    font-size: 10px;
+}
 
-        .work-badge {
-            position: absolute; top: 1px; right: 1px;
-            background-color: #ff9800; color: white;
-            font-size: 8px; padding: 0px 2px; border-radius: 2px; font-weight: bold;
-        }
+.calendar-day {
+    padding: 2px;
+    text-align: center;
+    border: 1px solid #ccc;
+    min-height: 42px;
+    line-height: 1.1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+}
 
-        .rest-badge {
-            position: absolute; top: 1px; right: 1px;
-            background-color: #4CAF50; color: white;
-            font-size: 8px; padding: 0px 2px; border-radius: 2px; font-weight: bold;
-        }
+.day-number {
+    font-size: 13px;
+    margin-bottom: 1px;
+}
 
-        .birthday-icon {
-            position: absolute; bottom: 3px; left: 3px;
-            font-size: 18px;
-            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' style='font-size:18px'><text y='24' x='0'>✨</text></svg>") 4 4, help;
-        }
+.lunar-date {
+    font-size: 9px;
+    color: #666;
+}
 
-        .past-day { text-decoration: line-through; color: #bbb; }
-        .other-month { color: #ccc; opacity: 0.5; }
-        .today { font-weight: bold; background-color: #fffacd !important; border: 1px solid #ff9800; }
-        .weekend { background-color: #fff0f0; }
+.holiday-label {
+    font-size: 9px;
+    color: #ff4444;
+    font-weight: bold;
+}
 
-        .embed-button {
-            padding: 4px 8px; background-color: #4CAF50; color: white;
-            border: none; border-radius: 3px; cursor: pointer; margin: 4px; font-size: 10px;
-        }
+.solar-term {
+    font-size: 9px;
+    color: #2196F3;
+    font-weight: bold;
+}
 
-        .arrow {
-            font-size: 14px; cursor: pointer; user-select: none;
-            border-radius: 50%; width: 22px; height: 22px;
-            display: inline-flex; align-items: center; justify-content: center;
-            background-color: #f0f0f0;
-        }
+.work-badge, .rest-badge {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    color: white;
+    font-size: 8px;
+    padding: 0 2px;
+    border-radius: 2px;
+    font-weight: bold;
+}
 
-        #calendar-controls {
-            display: flex; justify-content: center; align-items: center;
-            gap: 100px; margin-top: -30px; margin-bottom: 10px;
-        }
+.work-badge { background-color: #ff9800; }
+.rest-badge { background-color: #4CAF50; }
 
-        .hidden { display: none; }
+.birthday-icon {
+    position: absolute;
+    bottom: 3px;
+    left: 3px;
+    font-size: 16px;
+    cursor: help;
+}
 
-        .week-display {
-            font-size: 11px; text-align: center; padding: 3px;
-            border: 1px solid #ccc; line-height: 38px; color: #999;
-        }
+.past-day {
+    text-decoration: line-through;
+    color: #bbb;
+}
 
-        .legend {
-            margin: 15px auto; max-width: 440px; display: flex;
-            gap: 12px; justify-content: center; font-size: 9px; flex-wrap: wrap;
-        }
-        .legend-item { display: flex; align-items: center; gap: 4px; }
-        .legend-color { width: 10px; height: 10px; border-radius: 2px; }
-    </style>
+.other-month {
+    color: #ccc;
+    opacity: 0.5;
+}
+
+.today {
+    font-weight: bold;
+    background-color: #fffacd !important;
+    border: 1px solid #ff9800;
+}
+
+.weekend { background-color: #fff0f0; }
+
+.embed-button {
+    padding: 4px 8px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin: 4px;
+    font-size: 10px;
+}
+
+.arrow {
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+}
+
+#calendar-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 100px;
+    margin-top: -30px;
+    margin-bottom: 10px;
+}
+
+.hidden { display: none !important; }
+
+.week-display {
+    font-size: 11px;
+    text-align: center;
+    padding: 3px;
+    border: 1px solid #ccc;
+    line-height: 38px;
+    color: #999;
+}
+
+.legend {
+    margin: 15px auto;
+    max-width: 440px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    font-size: 9px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.legend-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+</style>
 </head>
+
 <body>
 
 <div class="calendar-container">
+
     <div id="initial-controls" class="controls">
+
         <select id="startDay">
             <option value="0">Start from Sunday</option>
             <option value="1">Start from Monday</option>
         </select>
+
         <select id="background">
             <option value="#ffffff">White</option>
             <option value="#f0f8ff">Light Blue</option>
@@ -132,197 +214,1087 @@
             <option value="#e6ffe6">Light Green</option>
             <option value="#e6e6fa">Light Purple</option>
         </select>
+
         <button id="embedButton" class="embed-button">Embed</button>
+
     </div>
 
     <div class="month-display"></div>
+
     <div id="calendar-controls">
-        <span class="arrow prev" style="position: relative; left:-50px;">&lt;</span>
-        <span class="arrow next" style="position: relative; right:-50px;">&gt;</span>
+        <span class="arrow prev">&lt;</span>
+        <span class="arrow next">&gt;</span>
     </div>
 
     <div id="calendar"></div>
+
+</div>
+
+<div class="legend">
+    <div class="legend-item">
+        <div class="legend-color" style="background:#ff9800"></div>
+        调休上班
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background:#4CAF50"></div>
+        休息日
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background:#fffacd;border:1px solid #ff9800"></div>
+        今天
+    </div>
+    <div class="legend-item">🎂 生日</div>
 </div>
 
 
 <script>
-    // ================= 配置区 =================
-    const customData = {
-        holidays: {
-            '1-26': '腊八节',
-            '2-10': '小年',
-            '2-16': '除夕',
-            '2-17': '春节',
-            '3-20': '龙抬头', '3-3': '元宵节',
-            '5-10':'母亲节',
-            '6-19':'端午节',
-            '8-19':'七夕节',
-            '9-25':'中秋节',
-            '10-19':'重阳节',
-            '11-1':'万圣节🎃','11-26':'感恩节',
-            '12-24':'平安夜','12-25':'圣诞节🎄',
-        },
-        birthdays: {
-            '5-19': 'My',
-            '3-15': 'Du',
-            '5-26': 'Ta',
-            '5-22': 'Mom',
-            '7-31': 'Du10000',
-            '10-4': 'My10000',
-        }
-    };
 
-    // 农历核心数据与逻辑
-    const lunarInfo = [0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,0x06ca0,0x0b550,0x15355,0x04da0,0x0a5d0,0x14573,0x052d0,0x0a9a8,0x0e950,0x06aa0,0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b5a0,0x195a6,0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,0x05aa0,0x076a3,0x096d0,0x04bd7,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0];
-    const monthCn = ["正","二","三","四","五","六","七","八","九","十","冬","腊"];
-    const nStr1 = ["日","一","二","三","四","五","六","七","八","九","十"];
+// ==================================================
+// 1. 固定个人数据
+// ==================================================
 
-    function getLunar(date) {
-        let i, leap=0, temp=0, offset = Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(1900,0,31))/86400000);
-        for(i=1900; i<2100 && offset>0; i++) {
-            temp = 348; for(let j=0x8000; j>0x8; j>>=1) temp += (lunarInfo[i-1900] & j)? 1:0;
-            let lv = lunarInfo[i-1900] & 0xf; temp += (lv ? (lunarInfo[i-1900] & 0x10000 ? 30 : 29) : 0);
-            offset -= temp;
-        }
-        if(offset<0) { offset += temp; i--; }
-        let lYear = i, lLeap = lunarInfo[i-1900] & 0xf, lIsLeap = false;
-        for(i=1; i<13 && offset>0; i++) {
-            if(lLeap>0 && i==(lLeap+1) && lIsLeap==false) { --i; lIsLeap=true; temp = (lunarInfo[lYear-1900] & 0x10000)? 30:29; }
-            else { temp = (lunarInfo[lYear-1900] & (0x10000>>i))? 30:29; }
-            if(lIsLeap==true && i==(lLeap+1)) lIsLeap=false; offset -= temp;
-        }
-        if(offset==0 && lLeap>0 && i==lLeap+1) { if(lIsLeap) lIsLeap=false; else { lIsLeap=true; --i; } }
-        if(offset<0) { offset += temp; --i; }
-        let lDay = offset + 1;
-        if (lDay === 1) return (lIsLeap?"闰":"") + monthCn[i-1] + "月";
-        return (lDay==10?"初十": lDay==20?"二十": lDay==30?"三十": ["初","十","廿","卅"][Math.floor(lDay/10)] + nStr1[lDay%10]);
+const customData = {
+
+    birthdays: {
+        '5-19': 'My',
+        '3-15': 'Du',
+        '5-26': 'Ta',
+        '5-22': 'Mom',
     }
+
+};
+
+
+// ==================================================
+// 2. 固定公历节日
+// ==================================================
+
+const chineseHolidays = {
+
+    '1-1': '元旦',
+    '2-14': '情人节',
+    '3-8': '妇女节',
+    '3-12': '植树节',
+    '5-1': '劳动节',
+    '5-4': '青年节',
+    '6-1': '儿童节',
+    '7-1': '建党节',
+    '8-1': '建军节',
+    '9-10': '教师节',
+    '10-1': '国庆节',
+    '11-1': '万圣节🎃',
+    '12-24': '平安夜',
+    '12-25': '圣诞节🎄'
+
+};
+
+
+// ==================================================
+// 3. 年度日历配置中心
+// ==================================================
+//
+// 每年只需要在这里新增一个年份。
+// 日期格式：月-日
+//
+// holidays：年度特殊节日
+// workdays：
+//    work = 调休上班
+//    rest = 放假
+//
+// 未配置的年份不会报错。
+// ==================================================
+
+const yearlyCalendarData = {
+
+    // ---------------- 2025 ----------------
+
+    2025: {
+
+        holidays: {},
+
+        workdays: {
+
+            '1-26': 'work',
+            '1-28': 'rest',
+            '1-29': 'rest',
+            '1-30': 'rest',
+            '1-31': 'rest',
+            '2-1': 'rest',
+            '2-2': 'rest',
+            '2-4': 'rest',
+
+            '4-4': 'rest',
+            '4-5': 'rest',
+            '4-6': 'rest',
+            '4-27': 'work',
+
+            '5-1': 'rest',
+            '5-2': 'rest',
+            '5-3': 'rest',
+            '5-4': 'rest',
+            '5-5': 'rest',
+
+            '5-31': 'rest',
+            '6-1': 'rest',
+            '6-2': 'rest',
+
+            '9-28': 'work',
+
+            '10-1': 'rest',
+            '10-2': 'rest',
+            '10-3': 'rest',
+            '10-4': 'rest',
+            '10-5': 'rest',
+            '10-6': 'rest',
+            '10-7': 'rest',
+            '10-8': 'rest',
+            '10-11': 'work'
+
+        }
+
+    },
+
+
+    // ---------------- 2026 ----------------
+
+    2026: {
+
+        holidays: {
+
+            '5-10': '母亲节',
+            '8-19': '七夕节',
+            '11-26': '感恩节'
+
+        },
+
+        workdays: {
+
+            '1-1': 'rest',
+            '1-2': 'rest',
+            '1-3': 'rest',
+            '1-4': 'work',
+
+            '2-14': 'work',
+            '2-15': 'rest',
+            '2-16': 'rest',
+            '2-17': 'rest',
+            '2-18': 'rest',
+            '2-19': 'rest',
+            '2-20': 'rest',
+            '2-21': 'rest',
+            '2-22': 'rest',
+            '2-23': 'rest',
+            '2-28': 'work',
+
+            '4-4': 'rest',
+            '4-5': 'rest',
+            '4-6': 'rest',
+
+            '5-1': 'rest',
+            '5-2': 'rest',
+            '5-3': 'rest',
+            '5-4': 'rest',
+            '5-5': 'rest',
+            '5-9': 'work',
+
+            '6-19': 'rest',
+            '6-20': 'rest',
+            '6-21': 'rest',
+
+            '9-20': 'work',
+            '9-25': 'rest',
+            '9-26': 'rest',
+            '9-27': 'rest',
+
+            '10-1': 'rest',
+            '10-2': 'rest',
+            '10-3': 'rest',
+            '10-4': 'rest',
+            '10-5': 'rest',
+            '10-6': 'rest',
+            '10-7': 'rest',
+            '10-10': 'work'
+
+        }
+
+    },
+
+
+    // ---------------- 2027 ----------------
+
     
-    const chineseHolidays = {
-        '1-1': '元旦', '2-14': '情人节', '3-8': '妇女节', '3-12': '植树节',
-        '5-1': '劳动节', '5-4': '青年节', '6-1': '儿童节', '7-1': '建党节',
-        '8-1': '建军节', '9-10': '教师节', '10-1': '国庆节'
+    // ---------------- 2027 ----------------
+
+    2027: {
+
+        holidays: {
+
+            '1-1': '元旦',
+
+            '2-5': '除夕',
+            '2-6': '春节',
+
+            '4-5': '清明节',
+
+            '5-1': '劳动节',
+
+            '6-9': '端午节',
+
+            '9-15': '中秋节',
+
+            '10-1': '国庆节'
+
+        },
+
+        workdays: {
+
+            // 元旦：1月1日 - 3日
+            '1-1': 'rest',
+            '1-2': 'rest',
+            '1-3': 'rest',
+
+            // 春节：2月5日 - 13日
+            '2-5': 'rest',
+            '2-6': 'rest',
+            '2-7': 'rest',
+            '2-8': 'rest',
+            '2-9': 'rest',
+            '2-10': 'rest',
+            '2-11': 'rest',
+            '2-12': 'rest',
+            '2-13': 'rest',
+
+            // 春节补班
+            '1-31': 'work',
+            '2-14': 'work',
+
+            // 清明节：4月3日 - 5日
+            '4-3': 'rest',
+            '4-4': 'rest',
+            '4-5': 'rest',
+
+            // 劳动节：5月1日 - 5日
+            '5-1': 'rest',
+            '5-2': 'rest',
+            '5-3': 'rest',
+            '5-4': 'rest',
+            '5-5': 'rest',
+
+            // 劳动节补班
+            '5-8': 'work',
+
+            // 端午节
+            '6-9': 'rest',
+
+            // 中秋节
+            '9-15': 'rest',
+
+            // 国庆节：10月1日 - 7日
+            '10-1': 'rest',
+            '10-2': 'rest',
+            '10-3': 'rest',
+            '10-4': 'rest',
+            '10-5': 'rest',
+            '10-6': 'rest',
+            '10-7': 'rest',
+
+            // 国庆节补班
+            '9-26': 'work',
+            '10-9': 'work'
+
+        }
+
+    }
+
+
+};
+
+
+// 年度数据读取接口
+
+function getYearCalendar(year) {
+
+    return yearlyCalendarData[year] || {
+        holidays: {},
+        workdays: {}
     };
 
-    const solarTerms2025 = {'1-5': '小寒', '1-20': '大寒', '2-3': '立春', '2-18': '雨水', '3-5': '惊蛰', '3-20': '春分', '4-4': '清明', '4-20': '谷雨', '5-5': '立夏', '5-21': '小满', '6-5': '芒种', '6-21': '夏至', '7-7': '小暑', '7-22': '大暑', '8-7': '立秋', '8-23': '处暑', '9-7': '白露', '9-23': '秋分', '10-8': '寒露', '10-23': '霜降', '11-7': '立冬', '11-22': '小雪', '12-7': '大雪', '12-21': '冬至'};
-    const solarTerms2026 = {'1-5': '小寒', '1-20': '大寒', '2-4': '立春', '2-18': '雨水', '3-5': '惊蛰', '3-20': '春分', '4-5': '清明', '4-20': '谷雨', '5-5': '立夏', '5-21': '小满', '6-5': '芒种', '6-21': '夏至', '7-7': '小暑', '7-23': '大暑', '8-7': '立秋', '8-23': '处暑', '9-7': '白露', '9-23': '秋分', '10-8': '寒露', '10-23': '霜降', '11-7': '立冬', '11-22': '小雪', '12-7': '大雪', '12-22': '冬至'};
-    const solarTermsByYear = { 2025: solarTerms2025, 2026: solarTerms2026 };
-    const workdayAdjustments2025 = {'1-26': 'work', '1-28': 'rest', '1-29': 'rest', '1-30': 'rest', '1-31': 'rest', '2-1': 'rest', '2-2': 'rest', '2-4': 'rest', '4-4': 'rest', '4-5': 'rest', '4-6': 'rest', '4-27': 'work', '5-1': 'rest', '5-2': 'rest', '5-3': 'rest', '5-4': 'rest', '5-5': 'rest', '5-31': 'rest', '6-1': 'rest', '6-2': 'rest', '9-28': 'work', '10-1': 'rest', '10-2': 'rest', '10-3': 'rest', '10-4': 'rest', '10-5': 'rest', '10-6': 'rest', '10-7': 'rest', '10-8': 'rest', '10-11': 'work'};
-    const workdayAdjustments2026 = {'1-1': 'rest', '1-2': 'rest', '1-3': 'rest', '1-4': 'work', '2-14': 'work', '2-15': 'rest', '2-16': 'rest', '2-17': 'rest', '2-18': 'rest', '2-19': 'rest', '2-20': 'rest', '2-21': 'rest', '2-22': 'rest', '2-23': 'rest', '2-28': 'work', '4-4': 'rest', '4-5': 'rest', '4-6': 'rest', '5-1': 'rest', '5-2': 'rest', '5-3': 'rest', '5-4': 'rest', '5-5': 'rest', '5-9': 'work', '6-19': 'rest', '6-20': 'rest', '6-21': 'rest', '9-20': 'work', '9-25': 'rest', '9-26': 'rest', '9-27': 'rest', '10-1': 'rest', '10-2': 'rest', '10-3': 'rest', '10-4': 'rest', '10-5': 'rest', '10-6': 'rest', '10-7': 'rest', '10-10': 'work'};
-    const workdayAdjustmentsByYear = { 2025: workdayAdjustments2025, 2026: workdayAdjustments2026 };
+}
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const calendar = document.getElementById("calendar");
-        const startDaySelect = document.getElementById("startDay");
-        const backgroundSelect = document.getElementById("background");
-        const embedButton = document.getElementById("embedButton");
-        const initialControls = document.getElementById("initial-controls");
-        const monthDisplay = document.querySelector(".month-display");
 
-        const today = new Date();
-        let viewMonth = today.getMonth();
-        let viewYear = today.getFullYear();
 
-        function getWeekNo(date) {
-            const firstDay = new Date(date.getFullYear(), 0, 1);
-            return Math.ceil((((date - firstDay) / 86400000) + firstDay.getDay() + 1) / 7);
-        }
+// ==================================================
+// 4. 农历计算
+// ==================================================
+//
+// 使用浏览器 Intl 原生 Chinese Calendar。
+// 支持闰月、农历月份和日期。
+// 现代 Chrome / Edge 均支持。
+// ==================================================
 
-        function render() {
-            const startDay = parseInt(startDaySelect.value);
-            const firstDayDate = new Date(viewYear, viewMonth, 1);
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const lunarFormatter = new Intl.DateTimeFormat(
+    'zh-CN-u-ca-chinese',
+    {
+        month: 'long',
+        day: 'numeric'
+    }
+);
 
-            monthDisplay.textContent = `${monthNames[viewMonth]} ${viewYear}`;
-            let html = '<div class="calendar-grid">';
-            const headers = startDay === 0 ? ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"] : ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-            headers.forEach(h => html += `<div class="calendar-header">${h}</div>`);
-            html += '<div class="calendar-header">Week</div>';
+function getLunarParts(date) {
 
-            let firstIdx = firstDayDate.getDay();
-            if (startDay === 1) firstIdx = (firstIdx === 0 ? 6 : firstIdx - 1);
+    const parts = lunarFormatter.formatToParts(date);
 
-            const lastDay = new Date(viewYear, viewMonth + 1, 0).getDate();
-            const prevLastDay = new Date(viewYear, viewMonth, 0).getDate();
-            let nextD = 1;
-            const rowCount = Math.ceil((firstIdx + lastDay) / 7);
+    const month = parts.find(
+        p => p.type === 'month'
+    )?.value || '';
 
-            for (let r = 0; r < rowCount; r++) {
-                for (let c = 0; c < 7; c++) {
-                    const i = r * 7 + c - firstIdx;
-                    if (i < 0) {
-                        html += `<div class="calendar-day other-month"><span class="day-number">${prevLastDay + i + 1}</span></div>`;
-                    } else if (i >= lastDay) {
-                        html += `<div class="calendar-day other-month"><span class="day-number">${nextD++}</span></div>`;
-                    } else {
-                        const curD = i + 1;
-                        const curObj = new Date(viewYear, viewMonth, curD);
-                        const mDK = `${viewMonth + 1}-${curD}`;
+    const day = parts.find(
+        p => p.type === 'day'
+    )?.value || '';
 
-                        const hol = customData.holidays[mDK] || chineseHolidays[mDK] || null;
-                        const sol = (solarTermsByYear[viewYear] || {})[mDK] || null;
-                        const bdy = customData.birthdays[mDK] || null;
-                        const adj = (workdayAdjustmentsByYear[viewYear] || {})[mDK] || null;
+    return { month, day };
 
-                        const isWE = (curObj.getDay() === 0 || curObj.getDay() === 6);
-                        const isToday = (curD === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear());
-                        const isPast = (curObj < new Date(today.getFullYear(), today.getMonth(), today.getDate()));
+}
 
-                        let cls = 'calendar-day' + (isToday ? ' today' : '') + (isPast ? ' past-day' : '') + (isWE && !adj ? ' weekend' : '');
 
-                        html += `<div class="${cls}">`;
-                        if(bdy) html += `<span class="birthday-icon" title="${bdy}">🎂</span>`;
-                        if(adj === 'work') html += '<span class="work-badge">班</span>';
-                        else if(adj === 'rest') html += '<span class="rest-badge">休</span>';
+// 判断农历节日
 
-                        html += `<span class="day-number">${curD}</span>`;
-                        // 有节日或节气时不显示农历
-                        if (hol) html += `<span class="holiday-label">${hol}</span>`;
-                        else if (sol) html += `<span class="solar-term">${sol}</span>`;
-                        else html += `<span class="lunar-date">${getLunar(curObj)}</span>`;
-                        html += '</div>';
-                    }
-                }
-                const weekDate = new Date(viewYear, viewMonth, Math.max(1, (r * 7) - firstIdx + 1));
-                html += `<div class="week-display">${getWeekNo(weekDate)}</div>`;
-            }
-            calendar.innerHTML = html + '</div>';
+function getLunarHoliday(date) {
 
-            // 背景色应用
-            const bg = backgroundSelect.value;
-            document.querySelectorAll('.calendar-day:not(.today):not(.weekend), .calendar-header, .week-display').forEach(el => el.style.backgroundColor = bg);
-        }
+    const lunar = getLunarParts(date);
 
-        // Embed 只保存偏好，不保存特定的年月
-        embedButton.addEventListener("click", () => {
-            const url = new URL(window.location.origin + window.location.pathname);
-            url.searchParams.set('startDay', startDaySelect.value);
-            url.searchParams.set('bg', backgroundSelect.value);
-            window.history.pushState({}, '', url.toString());
+    const nextDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate() + 1
+    );
 
-            navigator.clipboard.writeText(url.toString()).then(() => {
-                initialControls.classList.add("hidden");
-                alert('配置已保存！链接已复制到剪贴板。该链接将永远展示实时月份。');
-            });
+    const nextLunar = getLunarParts(nextDate);
+
+    // 春节
+    if (
+        lunar.month === '正月' &&
+        lunar.day === '初一'
+    ) return '春节';
+
+    // 元宵节
+    if (
+        lunar.month === '正月' &&
+        lunar.day === '十五'
+    ) return '元宵节';
+
+    // 端午节
+    if (
+        lunar.month === '五月' &&
+        lunar.day === '初五'
+    ) return '端午节';
+
+    // 七夕节
+    if (
+        lunar.month === '七月' &&
+        lunar.day === '初七'
+    ) return '七夕节';
+
+    // 中秋节
+    if (
+        lunar.month === '八月' &&
+        lunar.day === '十五'
+    ) return '中秋节';
+
+    // 重阳节
+    if (
+        lunar.month === '九月' &&
+        lunar.day === '初九'
+    ) return '重阳节';
+
+    // 腊八节
+    if (
+        lunar.month === '腊月' &&
+        lunar.day === '初八'
+    ) return '腊八节';
+
+    // 小年：北方腊月二十三，南方腊月二十四
+    if (
+        lunar.month === '腊月' &&
+        (lunar.day === '廿三' || lunar.day === '廿四')
+    ) return '小年';
+
+    // 除夕：农历月份的最后一天
+    if (
+        lunar.month !== nextLunar.month &&
+        (lunar.day === '廿九' || lunar.day === '三十')
+    ) return '除夕';
+
+    return null;
+
+}
+
+
+
+// ==================================================
+// 5. 二十四节气自动计算
+// ==================================================
+//
+// 使用常见的节气日期近似公式。
+// 2025、2026保留原始日期作为校准。
+// 其他年份使用公式计算，个别年份可能有一天误差。
+// ==================================================
+
+const solarTermNames = [
+    '小寒', '大寒',
+    '立春', '雨水',
+    '惊蛰', '春分',
+    '清明', '谷雨',
+    '立夏', '小满',
+    '芒种', '夏至',
+    '小暑', '大暑',
+    '立秋', '处暑',
+    '白露', '秋分',
+    '寒露', '霜降',
+    '立冬', '小雪',
+    '大雪', '冬至'
+];
+
+const solarTermConstants = {
+
+    1900: [
+        6.11, 20.84,
+        4.6295, 19.4599,
+        6.3826, 21.4155,
+        5.59, 20.888,
+        6.318, 21.86,
+        6.5, 22.20,
+        7.928, 23.65,
+        8.35, 23.95,
+        8.44, 23.822,
+        9.098, 24.218,
+        8.218, 23.08,
+        7.9, 22.6
+    ],
+
+    2000: [
+        5.4055, 20.12,
+        3.87, 18.73,
+        5.63, 20.646,
+        4.81, 20.1,
+        5.52, 21.04,
+        5.678, 21.37,
+        7.108, 22.83,
+        7.5, 23.13,
+        7.646, 23.042,
+        8.318, 23.438,
+        7.438, 22.36,
+        7.18, 21.94
+    ]
+
+};
+
+
+// 精确校准数据
+
+const solarTermOverrides = {
+
+    2025: {
+        '1-5': '小寒',
+        '1-20': '大寒',
+        '2-3': '立春',
+        '2-18': '雨水',
+        '3-5': '惊蛰',
+        '3-20': '春分',
+        '4-4': '清明',
+        '4-20': '谷雨',
+        '5-5': '立夏',
+        '5-21': '小满',
+        '6-5': '芒种',
+        '6-21': '夏至',
+        '7-7': '小暑',
+        '7-22': '大暑',
+        '8-7': '立秋',
+        '8-23': '处暑',
+        '9-7': '白露',
+        '9-23': '秋分',
+        '10-8': '寒露',
+        '10-23': '霜降',
+        '11-7': '立冬',
+        '11-22': '小雪',
+        '12-7': '大雪',
+        '12-21': '冬至'
+    },
+
+    2026: {
+        '1-5': '小寒',
+        '1-20': '大寒',
+        '2-4': '立春',
+        '2-18': '雨水',
+        '3-5': '惊蛰',
+        '3-20': '春分',
+        '4-5': '清明',
+        '4-20': '谷雨',
+        '5-5': '立夏',
+        '5-21': '小满',
+        '6-5': '芒种',
+        '6-21': '夏至',
+        '7-7': '小暑',
+        '7-23': '大暑',
+        '8-7': '立秋',
+        '8-23': '处暑',
+        '9-7': '白露',
+        '9-23': '秋分',
+        '10-8': '寒露',
+        '10-23': '霜降',
+        '11-7': '立冬',
+        '11-22': '小雪',
+        '12-22': '冬至'
+    }
+
+};
+
+
+function getSolarTerms(year) {
+
+    if (solarTermOverrides[year]) {
+        return solarTermOverrides[year];
+    }
+
+    const result = {};
+
+    const baseYear = year >= 2000 ? 2000 : 1900;
+
+    if (year < 1901 || year > 2099) {
+        return result;
+    }
+
+    const constants = solarTermConstants[baseYear];
+
+    const shortYear = year % 100;
+
+    solarTermNames.forEach((name, index) => {
+
+        const month = Math.floor(index / 2) + 1;
+
+        const day = Math.floor(
+            shortYear * 0.2422 +
+            constants[index] -
+            Math.floor((shortYear - 1) / 4)
+        );
+
+        result[`${month}-${day}`] = name;
+
+    });
+
+    return result;
+
+}
+
+
+
+// ==================================================
+// 6. 日期辅助函数
+// ==================================================
+
+function getWeekNo(date) {
+
+    const firstDay = new Date(
+        date.getFullYear(),
+        0,
+        1
+    );
+
+    return Math.ceil(
+        (
+            (date - firstDay) / 86400000 +
+            firstDay.getDay() + 1
+        ) / 7
+    );
+
+}
+
+
+function getDateKey(date) {
+
+    return `${date.getMonth() + 1}-${date.getDate()}`;
+
+}
+
+
+
+// ==================================================
+// 7. 日历主体
+// ==================================================
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const calendar = document.getElementById("calendar");
+
+    const startDaySelect = document.getElementById("startDay");
+
+    const backgroundSelect = document.getElementById("background");
+
+    const embedButton = document.getElementById("embedButton");
+
+    const initialControls = document.getElementById("initial-controls");
+
+    const monthDisplay = document.querySelector(".month-display");
+
+    const today = new Date();
+
+    const todayDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+    );
+
+    let viewMonth = today.getMonth();
+
+    let viewYear = today.getFullYear();
+
+
+    // ---------------- 渲染 ----------------
+
+    function render() {
+
+        const startDay = parseInt(startDaySelect.value);
+
+        const firstDayDate = new Date(
+            viewYear,
+            viewMonth,
+            1
+        );
+
+        const monthNames = [
+            "January", "February", "March",
+            "April", "May", "June",
+            "July", "August", "September",
+            "October", "November", "December"
+        ];
+
+        monthDisplay.textContent =
+            `${monthNames[viewMonth]} ${viewYear}`;
+
+
+        // 读取当前年份的数据
+
+        const yearData = getYearCalendar(viewYear);
+
+        const solarTerms = getSolarTerms(viewYear);
+
+
+        let html = '<div class="calendar-grid">';
+
+        const headers = startDay === 0
+            ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+            : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+
+        headers.forEach(h => {
+
+            html += `<div class="calendar-header">${h}</div>`;
+
         });
 
-        // 读入偏好
-        const params = new URLSearchParams(window.location.search);
-        if (params.has('startDay')) {
-            startDaySelect.value = params.get('startDay');
-            backgroundSelect.value = params.get('bg');
-            initialControls.classList.add("hidden");
+        html += '<div class="calendar-header">Week</div>';
+
+
+        let firstIdx = firstDayDate.getDay();
+
+        if (startDay === 1) {
+
+            firstIdx = firstIdx === 0
+                ? 6
+                : firstIdx - 1;
+
         }
 
-        // 箭头切换临时月份
-        document.querySelector(".prev").addEventListener("click", () => { viewMonth--; if(viewMonth<0){viewMonth=11;viewYear--;} render(); });
-        document.querySelector(".next").addEventListener("click", () => { viewMonth++; if(viewMonth>11){viewMonth=0;viewYear++;} render(); });
 
-        startDaySelect.addEventListener("change", render);
-        backgroundSelect.addEventListener("change", render);
+        const lastDay = new Date(
+            viewYear,
+            viewMonth + 1,
+            0
+        ).getDate();
 
-        render();
+        const prevLastDay = new Date(
+            viewYear,
+            viewMonth,
+            0
+        ).getDate();
+
+        const rowCount = Math.ceil(
+            (firstIdx + lastDay) / 7
+        );
+
+
+        // ---------------- 每一周 ----------------
+
+        for (let r = 0; r < rowCount; r++) {
+
+            for (let c = 0; c < 7; c++) {
+
+                const i = r * 7 + c - firstIdx;
+
+
+                // 上个月
+
+                if (i < 0) {
+
+                    html += `
+                        <div class="calendar-day other-month">
+                            <span class="day-number">
+                                ${prevLastDay + i + 1}
+                            </span>
+                        </div>
+                    `;
+
+                }
+
+
+                // 下个月
+
+                else if (i >= lastDay) {
+
+                    html += `
+                        <div class="calendar-day other-month">
+                            <span class="day-number">
+                                ${i - lastDay + 1}
+                            </span>
+                        </div>
+                    `;
+
+                }
+
+
+                // 当前月份
+
+                else {
+
+                    const curD = i + 1;
+
+                    const curObj = new Date(
+                        viewYear,
+                        viewMonth,
+                        curD
+                    );
+
+                    const mDK = getDateKey(curObj);
+
+
+                    // 获取各种数据
+
+                    const customHoliday =
+                        yearData.holidays[mDK] || null;
+
+                    const fixedHoliday =
+                        chineseHolidays[mDK] || null;
+
+                    const lunarHoliday =
+                        getLunarHoliday(curObj);
+
+                    const hol =
+                        customHoliday ||
+                        lunarHoliday ||
+                        fixedHoliday;
+
+
+                    const sol =
+                        solarTerms[mDK] || null;
+
+                    const bdy =
+                        customData.birthdays[mDK] || null;
+
+                    const adj =
+                        yearData.workdays[mDK] || null;
+
+
+                    // 日期状态
+
+                    const isWE =
+                        curObj.getDay() === 0 ||
+                        curObj.getDay() === 6;
+
+                    const isToday =
+                        curD === today.getDate() &&
+                        viewMonth === today.getMonth() &&
+                        viewYear === today.getFullYear();
+
+                    const isPast = curObj < todayDate;
+
+
+                    let cls = 'calendar-day';
+
+                    if (isToday) cls += ' today';
+
+                    if (isPast) cls += ' past-day';
+
+                    if (isWE && !adj) cls += ' weekend';
+
+
+                    html += `<div class="${cls}">`;
+
+
+                    // 生日
+
+                    if (bdy) {
+
+                        html += `
+                            <span
+                                class="birthday-icon"
+                                title="${bdy}"
+                            >🎂</span>
+                        `;
+
+                    }
+
+
+                    // 调休状态
+
+                    if (adj === 'work') {
+
+                        html += '<span class="work-badge">班</span>';
+
+                    } else if (adj === 'rest') {
+
+                        html += '<span class="rest-badge">休</span>';
+
+                    }
+
+
+                    // 日期数字
+
+                    html += `
+                        <span class="day-number">${curD}</span>
+                    `;
+
+
+                    // 节日优先于节气，节气优先于农历
+
+                    if (hol) {
+
+                        html += `
+                            <span class="holiday-label">${hol}</span>
+                        `;
+
+                    } else if (sol) {
+
+                        html += `
+                            <span class="solar-term">${sol}</span>
+                        `;
+
+                    } else {
+
+                        const lunar = getLunarParts(curObj);
+
+                        html += `
+                            <span class="lunar-date">
+                                ${lunar.month === '正月' && lunar.day === '初一'
+                                    ? '春节'
+                                    : lunar.day}
+                            </span>
+                        `;
+
+                    }
+
+
+                    html += '</div>';
+
+                }
+
+            }
+
+
+            // 周数
+
+            const weekDate = new Date(
+                viewYear,
+                viewMonth,
+                Math.max(
+                    1,
+                    r * 7 - firstIdx + 1
+                )
+            );
+
+            html += `
+                <div class="week-display">
+                    ${getWeekNo(weekDate)}
+                </div>
+            `;
+
+        }
+
+
+        calendar.innerHTML = html + '</div>';
+
+
+        // ---------------- 背景颜色 ----------------
+
+        const bg = backgroundSelect.value;
+
+        document.querySelectorAll(
+            '.calendar-day:not(.today):not(.weekend), .calendar-header, .week-display'
+        ).forEach(el => {
+
+            el.style.backgroundColor = bg;
+
+        });
+
+    }
+
+
+
+    // ==================================================
+    // 8. Embed 功能
+    // ==================================================
+
+    embedButton.addEventListener("click", async () => {
+
+        const url = new URL(
+            window.location.href
+        );
+
+        url.searchParams.set(
+            'startDay',
+            startDaySelect.value
+        );
+
+        url.searchParams.set(
+            'bg',
+            backgroundSelect.value
+        );
+
+        url.searchParams.delete('year');
+        url.searchParams.delete('month');
+
+        try {
+
+            await navigator.clipboard.writeText(
+                url.toString()
+            );
+
+            window.history.pushState(
+                {},
+                '',
+                url.toString()
+            );
+
+            initialControls.classList.add("hidden");
+
+            alert(
+                '配置已保存！链接已复制到剪贴板。该链接将始终展示实时月份。'
+            );
+
+        } catch (error) {
+
+            alert(
+                '复制失败，请检查浏览器剪贴板权限。'
+            );
+
+        }
+
     });
+
+
+
+    // ==================================================
+    // 9. 读取 Embed 参数
+    // ==================================================
+
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    if (params.has('startDay')) {
+
+        const start = params.get('startDay');
+
+        if (start === '0' || start === '1') {
+            startDaySelect.value = start;
+        }
+
+        const bg = params.get('bg');
+
+        const validBackgrounds = [
+            '#ffffff',
+            '#f0f8ff',
+            '#f5f5dc',
+            '#e6ffe6',
+            '#e6e6fa'
+        ];
+
+        if (validBackgrounds.includes(bg)) {
+            backgroundSelect.value = bg;
+        }
+
+        initialControls.classList.add("hidden");
+
+    }
+
+
+
+    // ==================================================
+    // 10. 月份切换
+    // ==================================================
+
+    document.querySelector(".prev").addEventListener(
+        "click",
+        () => {
+
+            viewMonth--;
+
+            if (viewMonth < 0) {
+
+                viewMonth = 11;
+
+                viewYear--;
+
+            }
+
+            render();
+
+        }
+    );
+
+
+    document.querySelector(".next").addEventListener(
+        "click",
+        () => {
+
+            viewMonth++;
+
+            if (viewMonth > 11) {
+
+                viewMonth = 0;
+
+                viewYear++;
+
+            }
+
+            render();
+
+        }
+    );
+
+
+    // 星期起始日
+
+    startDaySelect.addEventListener(
+        "change",
+        render
+    );
+
+
+    // 背景颜色
+
+    backgroundSelect.addEventListener(
+        "change",
+        render
+    );
+
+
+    // 初始化
+
+    render();
+
+});
+
 </script>
+
 </body>
 </html>
