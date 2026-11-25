@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Calendar</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 12px;
+            font-family: Arial, sans-serif;
+            color: #222;
+        }
+
+        .calendar-container {
+            width: 100%;
+            max-width: 340px;
+            margin: 20px auto;
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        select {
+            min-width: 0;
+            max-width: 100%;
+            font-size: 13px;
+            padding: 5px;
+        }
+
+        .embed-button {
+            padding: 6px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .month-display {
+            flex: 1;
+            min-width: 0;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            white-space: nowrap;
+        }
+
+        /* The navigation controls use a normal three-column layout.
+           The arrows no longer use absolute positioning. */
+        #calendar-controls {
+            display: grid;
+            grid-template-columns: 36px minmax(0, 1fr) 36px;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .arrow {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: #f1f1f1;
+            color: #222;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .arrow:hover {
+            background: #e4e4e4;
+        }
+
+        #calendar-controls .month-display {
+            min-width: 0;
+            margin: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr)) 42px;
+            gap: 2px;
+            width: 100%;
+        }
+
+        .calendar-header,
+        .calendar-day,
+        .week-display {
+            min-width: 0;
+            padding: 5px 2px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        .calendar-header {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .calendar-day {
+            min-height: 30px;
+            line-height: 20px;
+        }
+
+        .week-display {
+            min-height: 30px;
+            font-size: 11px;
+            line-height: 20px;
+        }
+
+        .past-day {
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .other-month {
+            color: #ccc;
+        }
+
+        .today {
+            font-weight: bold;
+            outline: 2px solid #4CAF50;
+            outline-offset: -2px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 320px) {
+            .calendar-container {
+                font-size: 12px;
+            }
+
+            .calendar-grid {
+                grid-template-columns: repeat(7, minmax(0, 1fr)) 36px;
+                gap: 1px;
+            }
+
+            .calendar-day,
+            .calendar-header,
+            .week-display {
+                padding-left: 1px;
+                padding-right: 1px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div id="initial-controls" class="controls">
+            <select id="startDay" aria-label="First day of week">
+                <option value="0">Start from Sunday</option>
+                <option value="1">Start from Monday</option>
+            </select>
+
+            <select id="background" aria-label="Calendar background">
+                <option value="#ffffff">White Grid</option>
+                <option value="#f0f8ff">Light Blue Grid</option>
+                <option value="#f5f5dc">Beige Grid</option>
+                <option value="#e6ffe6">Light Green Grid</option>
+                <option value="#e6e6fa">Light Purple Grid</option>
+            </select>
+
+            <button id="embedButton" class="embed-button" type="button">Embed</button>
+        </div>
+
+        <div id="standaloneMonthDisplay" class="month-display hidden"></div>
+
+        <div id="calendar-controls">
+            <button class="arrow prev" type="button" aria-label="Previous month">&lt;</button>
+            <div id="embeddedMonthDisplay" class="month-display"></div>
+            <button class="arrow next" type="button" aria-label="Next month">&gt;</button>
+        </div>
+
+        <div id="calendar"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const calendar = document.getElementById("calendar");
+            const startDaySelect = document.getElementById("startDay");
+            const backgroundSelect = document.getElementById("background");
+            const embedButton = document.getElementById("embedButton");
+            const initialControls = document.getElementById("initial-controls");
+            const calendarControls = document.getElementById("calendar-controls");
+            const standaloneMonthDisplay = document.getElementById("standaloneMonthDisplay");
+            const embeddedMonthDisplay = document.getElementById("embeddedMonthDisplay");
+
+            const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+
+            let currentMonth = new Date().getMonth();
+            let currentYear = new Date().getFullYear();
+
+            function getWeekNumber(date) {
+                const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+                const pastDaysOfYear = Math.floor((date - firstDayOfYear) / 86400000);
+                return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+            }
+
+            function updateMonthTitles() {
+                const title = `${monthNames[currentMonth]} ${currentYear}`;
+                standaloneMonthDisplay.textContent = title;
+                embeddedMonthDisplay.textContent = title;
+            }
+
+            function applyGridColor() {
+                const gridColor = backgroundSelect.value;
+                document.querySelectorAll(
+                    ".calendar-day, .calendar-header, .week-display"
+                ).forEach(element => {
+                    element.style.backgroundColor = gridColor;
+                });
+            }
+
+            function generateCalendar() {
+                const startDay = Number.parseInt(startDaySelect.value, 10);
+                const today = new Date();
+                const firstDate = new Date(currentYear, currentMonth, 1);
+                const lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+                const previousMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+
+                updateMonthTitles();
+
+                const days = startDay === 0
+                    ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+                    : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+                let firstDayOffset = firstDate.getDay();
+                if (startDay === 1) {
+                    firstDayOffset = firstDayOffset === 0 ? 6 : firstDayOffset - 1;
+                }
+
+                const totalRows = Math.ceil((firstDayOffset + lastDay) / 7);
+                let calendarHTML = '<div class="calendar-grid">';
+
+                days.forEach(day => {
+                    calendarHTML += `<div class="calendar-header">${day}</div>`;
+                });
+                calendarHTML += '<div class="calendar-header">Week</div>';
+
+                for (let row = 0; row < totalRows; row++) {
+                    for (let col = 0; col < 7; col++) {
+                        const dayIndex = row * 7 + col - firstDayOffset;
+
+                        if (dayIndex < 0) {
+                            const previousDay = previousMonthLastDay + dayIndex + 1;
+                            calendarHTML += `<div class="calendar-day other-month">${previousDay}</div>`;
+                        } else if (dayIndex >= lastDay) {
+                            const nextDay = dayIndex - lastDay + 1;
+                            calendarHTML += `<div class="calendar-day other-month">${nextDay}</div>`;
+                        } else {
+                            const day = dayIndex + 1;
+                            const cellDate = new Date(currentYear, currentMonth, day);
+                            const isToday =
+                                day === today.getDate() &&
+                                currentMonth === today.getMonth() &&
+                                currentYear === today.getFullYear();
+                            const isPast = cellDate < new Date(
+                                today.getFullYear(), today.getMonth(), today.getDate()
+                            );
+
+                            calendarHTML += `<div class="calendar-day${isToday ? " today" : ""}${isPast ? " past-day" : ""}">${day}</div>`;
+                        }
+                    }
+
+                    const weekDate = new Date(
+                        currentYear,
+                        currentMonth,
+                        1 - firstDayOffset + row * 7
+                    );
+                    calendarHTML += `<div class="week-display">${getWeekNumber(weekDate)}</div>`;
+                }
+
+                calendarHTML += "</div>";
+                calendar.innerHTML = calendarHTML;
+                applyGridColor();
+            }
+
+            function updateURL() {
+                const url = new URL(window.location.href);
+                url.searchParams.set("startDay", startDaySelect.value);
+                url.searchParams.set("background", backgroundSelect.value);
+                url.searchParams.set("month", String(currentMonth));
+                url.searchParams.set("year", String(currentYear));
+                window.history.replaceState({}, "", url.toString());
+                return url.toString();
+            }
+
+            function changeMonth(delta) {
+                currentMonth += delta;
+
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                } else if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+
+                generateCalendar();
+
+                if (!calendarControls.classList.contains("hidden")) {
+                    updateURL();
+                }
+            }
+
+            function showEmbeddedMode() {
+                initialControls.classList.add("hidden");
+                standaloneMonthDisplay.classList.add("hidden");
+                calendarControls.classList.remove("hidden");
+            }
+
+            embedButton.addEventListener("click", async () => {
+                // Update the URL first so the copied link includes the current settings and month.
+                const embedUrl = updateURL();
+
+                try {
+                    await navigator.clipboard.writeText(embedUrl);
+                    showEmbeddedMode();
+                } catch (error) {
+                    // The calendar still switches modes if clipboard access is blocked.
+                    showEmbeddedMode();
+                    window.prompt("Copy this calendar URL:", embedUrl);
+                }
+            });
+
+            document.querySelector(".prev").addEventListener("click", () => changeMonth(-1));
+            document.querySelector(".next").addEventListener("click", () => changeMonth(1));
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasEmbedSettings =
+                urlParams.has("startDay") && urlParams.has("background");
+
+            if (hasEmbedSettings) {
+                const savedStartDay = urlParams.get("startDay");
+                const savedBackground = urlParams.get("background");
+
+                if (savedStartDay === "0" || savedStartDay === "1") {
+                    startDaySelect.value = savedStartDay;
+                }
+
+                if ([...backgroundSelect.options].some(option => option.value === savedBackground)) {
+                    backgroundSelect.value = savedBackground;
+                }
+
+                const savedMonth = Number.parseInt(urlParams.get("month"), 10);
+                const savedYear = Number.parseInt(urlParams.get("year"), 10);
+
+                if (Number.isInteger(savedMonth) && savedMonth >= 0 && savedMonth <= 11) {
+                    currentMonth = savedMonth;
+                }
+                if (Number.isInteger(savedYear) && savedYear >= 1) {
+                    currentYear = savedYear;
+                }
+
+                initialControls.classList.add("hidden");
+            }
+
+            startDaySelect.addEventListener("change", () => {
+                generateCalendar();
+                if (hasEmbedSettings) updateURL();
+            });
+
+            backgroundSelect.addEventListener("change", () => {
+                generateCalendar();
+                if (hasEmbedSettings) updateURL();
+            });
+
+            generateCalendar();
+        });
+    </script>
+</body>
+</html>
